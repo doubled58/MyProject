@@ -1,6 +1,7 @@
 package Student_Controller;
 
 import DAL.ExamDAO;
+import DAL.RequestRegisterDAO;
 import Models.Exam;
 import Models.User;
 import java.io.IOException;
@@ -49,9 +50,10 @@ public class StudentExamRegisterController extends HttpServlet {
             return;
         }
 
-        examDAO.registerExam(userId, id, "");
+        // examDAO.registerExam(userId, id, "");
+        new RequestRegisterDAO().createRequest(String.valueOf(userId), request.getParameter("id"));
         //request.setAttribute("message", "*Registered exam successfully!");
-        
+
         studentExamController.doGet(request, response);
     }
 

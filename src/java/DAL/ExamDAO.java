@@ -23,7 +23,7 @@ import java.util.logging.Logger;
  * @author Dell
  */
 public class ExamDAO extends DBContext {
-
+    
     public boolean checkIfExamAlreadyExisted(Exam exam) {
         String sql = "select id from exams where slot_id = ? and subject_id = ? and date = ?";
         try {
@@ -41,8 +41,8 @@ public class ExamDAO extends DBContext {
         }
         return false;
     }
-
-    public ArrayList<Exam> getAllExams() {
+    
+    public ArrayList<Exam> getAllExams(int uid) {
         String sql = "select exams.id as id, slot_id, subject_id, exams.name as name, date, room, note, max_size, \n"
                 + "slots.name as slot_name, start_time, end_time, \n"
                 + "subject_id, subjects.name as subject_name from exams \n"
@@ -70,17 +70,18 @@ public class ExamDAO extends DBContext {
                 exam.setRoom(room);
                 exam.setNote(note);
                 exam.setMaxSize(maxSize);
-
+                exam.setCheckRegisted(new RequestRegisterDAO().checkRegisted(String.valueOf(uid), rs.getString("id")));
+              
                 String slotName = rs.getString("slot_name");
                 Time startTime = rs.getTime("start_time");
                 Time endTime = rs.getTime("end_time");
                 Slot slot = new Slot(slotId, slotName, startTime, endTime);
                 exam.setSlot(slot);
-
+                
                 String subjectName = rs.getString("subject_name");
                 Subject subject = new Subject(subjectId, subjectName);
                 exam.setSubject(subject);
-
+                
                 exams.add(exam);
             }
             return exams;
@@ -89,7 +90,55 @@ public class ExamDAO extends DBContext {
         }
         return null;
     }
-
+    
+     public ArrayList<Exam> getAllExams() {
+        String sql = "select exams.id as id, slot_id, subject_id, exams.name as name, date, room, note, max_size, \n"
+                + "slots.name as slot_name, start_time, end_time, \n"
+                + "subject_id, subjects.name as subject_name from exams \n"
+                + "join slots on slots.id = exams.slot_id \n"
+                + "join subjects on subjects.id = exams.subject_id";
+        try {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            ArrayList<Exam> exams = new ArrayList<>();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                int slotId = rs.getInt("slot_id");
+                String subjectId = rs.getString("subject_id");
+                String name = rs.getString("name");
+                Date date = rs.getDate("date");
+                String room = rs.getString("room");
+                String note = rs.getString("note");
+                int maxSize = rs.getInt("max_size");
+                Exam exam = new Exam();
+                exam.setId(id);
+                exam.setSlotId(slotId);
+                exam.setSubjectId(subjectId);
+                exam.setName(name);
+                exam.setDate(date);
+                exam.setRoom(room);
+                exam.setNote(note);
+                exam.setMaxSize(maxSize);
+              
+                String slotName = rs.getString("slot_name");
+                Time startTime = rs.getTime("start_time");
+                Time endTime = rs.getTime("end_time");
+                Slot slot = new Slot(slotId, slotName, startTime, endTime);
+                exam.setSlot(slot);
+                
+                String subjectName = rs.getString("subject_name");
+                Subject subject = new Subject(subjectId, subjectName);
+                exam.setSubject(subject);
+                
+                exams.add(exam);
+            }
+            return exams;
+        } catch (SQLException ex) {
+            Logger.getLogger(ExamDAO.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
     public ArrayList<Exam> getAllExamsByStudentId(int studentId) {
         String sql = "select exams.id as id, slot_id, subject_id, exams.name as name, date, room, exams.note as note, max_size,\n"
                 + "slots.name as slot_name, start_time, end_time,\n"
@@ -113,7 +162,7 @@ public class ExamDAO extends DBContext {
                     String room = rs.getString("room");
                     String note = rs.getString("note");
                     int maxSize = rs.getInt("max_size");
-
+                    
                     Exam exam = new Exam();
                     exam.setId(id);
                     exam.setSlotId(slotId);
@@ -123,20 +172,20 @@ public class ExamDAO extends DBContext {
                     exam.setRoom(room);
                     exam.setNote(note);
                     exam.setMaxSize(maxSize);
-
+                    
                     String slotName = rs.getString("slot_name");
                     Time startTime = rs.getTime("start_time");
                     Time endTime = rs.getTime("end_time");
                     Slot slot = new Slot(slotId, slotName, startTime, endTime);
                     exam.setSlot(slot);
-
+                    
                     String subjectName = rs.getString("subject_name");
                     Subject subject = new Subject(subjectId, subjectName);
                     exam.setSubject(subject);
-
+                    
                     String studentNote = rs.getString("student_note");
                     exam.setStudentNote(studentNote);
-
+                    
                     exams.add(exam);
                 }
                 return exams;
@@ -146,7 +195,7 @@ public class ExamDAO extends DBContext {
         }
         return null;
     }
-
+    
     public Exam getStudentExam(int studentId, int examId) {
         String sql = "select exams.id as id, slot_id, subject_id, exams.name as name, date, room, exams.note as note, max_size,\n"
                 + "slots.name as slot_name, start_time, end_time,\n"
@@ -170,7 +219,7 @@ public class ExamDAO extends DBContext {
                     String room = rs.getString("room");
                     String note = rs.getString("note");
                     int maxSize = rs.getInt("max_size");
-
+                    
                     Exam exam = new Exam();
                     exam.setId(id);
                     exam.setSlotId(slotId);
@@ -180,20 +229,20 @@ public class ExamDAO extends DBContext {
                     exam.setRoom(room);
                     exam.setNote(note);
                     exam.setMaxSize(maxSize);
-
+                    
                     String slotName = rs.getString("slot_name");
                     Time startTime = rs.getTime("start_time");
                     Time endTime = rs.getTime("end_time");
                     Slot slot = new Slot(slotId, slotName, startTime, endTime);
                     exam.setSlot(slot);
-
+                    
                     String subjectName = rs.getString("subject_name");
                     Subject subject = new Subject(subjectId, subjectName);
                     exam.setSubject(subject);
-
+                    
                     String studentNote = rs.getString("student_note");
                     exam.setStudentNote(studentNote);
-
+                    
                     return exam;
                 }
             }
@@ -202,7 +251,7 @@ public class ExamDAO extends DBContext {
         }
         return null;
     }
-
+    
     public Exam getExamById(int id) {
         String sql = "select exams.id as id, slot_id, subject_id, exams.name as name, date, room, note, max_size, \n"
                 + "slots.name as slot_name, start_time, end_time, \n"
@@ -230,17 +279,17 @@ public class ExamDAO extends DBContext {
                     exam.setRoom(room);
                     exam.setNote(note);
                     exam.setMaxSize(maxSize);
-
+                    
                     String slotName = rs.getString("slot_name");
                     Time startTime = rs.getTime("start_time");
                     Time endTime = rs.getTime("end_time");
                     Slot slot = new Slot(slotId, slotName, startTime, endTime);
                     exam.setSlot(slot);
-
+                    
                     String subjectName = rs.getString("subject_name");
                     Subject subject = new Subject(subjectId, subjectName);
                     exam.setSubject(subject);
-
+                    
                     return exam;
                 }
             }
@@ -249,7 +298,7 @@ public class ExamDAO extends DBContext {
         }
         return null;
     }
-
+    
     public Exam addExam(Exam exam) {
         String sql = "insert into exams(slot_id, subject_id, name, date, room, note, max_size) values (?, ?, ?, ?, ?, ?, ?)";
         try {
@@ -270,7 +319,7 @@ public class ExamDAO extends DBContext {
         }
         return null;
     }
-
+    
     public Exam updateExam(Exam exam) {
         String sql = "update exams set slot_id = ?, subject_id = ?, name = ?, date = ?, room = ?, note = ?, max_size = ? where id = ?";
         try {
@@ -292,7 +341,7 @@ public class ExamDAO extends DBContext {
         }
         return null;
     }
-
+    
     public Exam deleteExam(Exam exam) {
         String sql = "delete from exams where id = ?";
         try {
@@ -307,7 +356,7 @@ public class ExamDAO extends DBContext {
         }
         return null;
     }
-
+    
     public boolean registerExam(int studentId, int examId, String note) {
         String sql = "insert into exam_students(exam_id, student_id, note) values (?, ?, ?)";
         try {
@@ -324,7 +373,7 @@ public class ExamDAO extends DBContext {
         }
         return false;
     }
-
+    
     public boolean unregisterExam(int studentId, int examId) {
         String sql = "delete from exam_students where exam_id = ? and student_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -339,7 +388,7 @@ public class ExamDAO extends DBContext {
         }
         return false;
     }
-
+    
     public ArrayList<User> getExamStudentList(int examId) {
         String sql = "select student_id, users.username as student_username, users.name as student_name, users.email as student_email, \n"
                 + "users.dob as student_dob, classes.id as class_id, classes.name as class_name, \n"
@@ -357,11 +406,11 @@ public class ExamDAO extends DBContext {
                     String studentName = rs.getString("student_name");
                     String studentEmail = rs.getString("student_email");
                     Date studentDob = rs.getDate("student_dob");
-
+                    
                     int classId = rs.getInt("class_id");
                     String className = rs.getString("class_name");
                     Classes classes = new Classes(classId, className);
-
+                    
                     User student = new User();
                     student.setClassId(classId);
                     student.setDob(studentDob);
@@ -370,10 +419,10 @@ public class ExamDAO extends DBContext {
                     student.setClasses(classes);
                     student.setName(studentName);
                     student.setUsername(studentUsername);
-
+                    
                     String studentNote = rs.getString("student_note");
                     student.setStudentNote(studentNote);
-
+                    
                     students.add(student);
                 }
                 return students;
@@ -383,7 +432,7 @@ public class ExamDAO extends DBContext {
         }
         return null;
     }
-
+    
     public boolean updateStudentExam(int studentId, int examId, String note) {
         String sql = "update exam_students set note = ? where student_id = ? and exam_id = ?";
         try {
@@ -400,7 +449,7 @@ public class ExamDAO extends DBContext {
         }
         return false;
     }
-
+    
     public int getExamRegistedNumbers(int examId) {
         String sql = "select count(student_id) as total from exam_students where exam_id = ?";
         try {
@@ -423,7 +472,7 @@ public class ExamDAO extends DBContext {
 
         // Gọi phương thức getAllExams để lấy danh sách tất cả các kỳ thi từ cơ sở dữ liệu
         ArrayList<Exam> allExams = examDAO.getAllExams();
-
+        
         if (allExams != null) {
             System.out.println("List of all exams:");
             for (Exam exam : allExams) {
@@ -435,19 +484,19 @@ public class ExamDAO extends DBContext {
                 System.out.println("Room: " + exam.getRoom());
                 System.out.println("Note: " + exam.getNote());
                 System.out.println("Max Size: " + exam.getMaxSize());
-
+                
                 Slot slot = exam.getSlot();
                 System.out.println("Slot Info:");
                 System.out.println("\tID: " + slot.getId());
                 System.out.println("\tName: " + slot.getName());
                 System.out.println("\tStart Time: " + slot.getStartTime());
                 System.out.println("\tEnd Time: " + slot.getEndTime());
-
+                
                 Subject subject = exam.getSubject();
                 System.out.println("Subject Info:");
                 System.out.println("\tID: " + subject.getId());
                 System.out.println("\tName: " + subject.getName());
-
+                
                 System.out.println("---------------------------------------");
             }
         } else {

@@ -83,8 +83,13 @@
                                                                class="btn btn-danger mb-sm-2">Unregister</a>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <a href="${pageContext.request.contextPath}/student/exam/register?id=${item.id}"
-                                                               class="btn btn-primary mb-sm-2 mb-md-0">Register</a>
+                                                            <c:if test="${item.checkRegisted==false}">
+                                                                <a href="${pageContext.request.contextPath}/student/exam/register?id=${item.id}"
+                                                                   class="btn btn-primary mb-sm-2 mb-md-0">Register</a>
+                                                            </c:if>
+                                                            <c:if test="${item.checkRegisted==true}">
+                                                                Pending
+                                                            </c:if>
                                                         </c:otherwise>
                                                     </c:choose>
                                                 </td>

@@ -22,7 +22,7 @@ public class Exam {
     private Slot slot;
     private Subject subject;
     private String studentNote;
-
+    private boolean checkRegisted;
     public Exam() {
     }
 
@@ -126,6 +126,14 @@ public class Exam {
 
     public void setStudentNote(String studentNote) {
         this.studentNote = studentNote;
+    }
+
+    public boolean isCheckRegisted() {
+        return checkRegisted;
+    }
+
+    public void setCheckRegisted(boolean checkRegisted) {
+        this.checkRegisted = checkRegisted;
     }
     
     
